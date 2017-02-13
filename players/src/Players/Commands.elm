@@ -4,6 +4,7 @@ import Http
 import Json.Decode as Decode exposing (field)
 import Players.Models exposing (Player, PlayerId)
 import Players.Messages exposing (..)
+import Json.Encode as Encode
 
 
 fetchAll : Cmd Msg
@@ -28,3 +29,38 @@ memberDecoder =
         (field "id" Decode.string)
         (field "name" Decode.string)
         (field "level" Decode.int)
+
+
+saveUrl : PlayerId -> String
+saveUrl playerId =
+    "http://localhost:4000/players/" ++ playerId
+
+
+saveRequest : Player -> Http.Request Player
+saveRequest player =
+    Http.request
+        { method = "PATCH"
+        , headers = []
+        , url = saveUrl player.id
+        , body = memberEncoded player |> Http.jsonBody
+        , expect = Http.expectJson memberDecoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+save : Player -> Cmd Msg
+save player =
+    saveRequest player |> Http.send OnSave
+
+
+memberEncoded : Player -> Encode.Value
+memberEncoded player =
+    let
+        list =
+            [ ( "id", Encode.string player.id )
+            , ( "name", Encode.string player.name )
+            , ( "level", Encode.int player.level )
+            ]
+    in
+        list |> Encode.object
