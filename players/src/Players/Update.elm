@@ -3,7 +3,7 @@ module Players.Update exposing (..)
 import Navigation
 import Players.Messages exposing (Msg(..), NewPlayerMsg(..))
 import Players.Models exposing (Player, PlayerId)
-import Players.Commands exposing (save, createPlayer)
+import Players.Commands exposing (save, createPlayer, deletePlayer)
 import Models exposing (Model)
 
 
@@ -76,6 +76,23 @@ update msg model =
                             { player | level = level }
                     in
                         ( { model | newPlayer = newPlayer }, Cmd.none )
+
+        DeletePlayer playerId ->
+            ( model, deletePlayer playerId )
+
+        OnDelete (Ok playerId) ->
+            let
+                players =
+                    List.filter (\p -> p.id /= playerId) model.players
+            in
+                ( { model | players = players }, Navigation.newUrl "#players" )
+
+        OnDelete (Err error) ->
+            let
+                err =
+                    Debug.log "Error Deleting player" error
+            in
+                ( model, Cmd.none )
 
 
 changeLevelCommands : PlayerId -> Int -> List Player -> List (Cmd Msg)

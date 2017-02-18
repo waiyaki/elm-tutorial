@@ -1,7 +1,7 @@
 module Players.Commands exposing (..)
 
 import Http
-import Json.Decode as Decode exposing (field)
+import Json.Decode as Decode exposing (field, succeed)
 import Players.Models exposing (Player, PlayerId)
 import Players.Messages exposing (..)
 import Models exposing (NewPlayer)
@@ -32,8 +32,8 @@ memberDecoder =
         (field "level" Decode.int)
 
 
-saveUrl : PlayerId -> String
-saveUrl playerId =
+detailUrl : PlayerId -> String
+detailUrl playerId =
     "http://localhost:4000/players/" ++ playerId
 
 
@@ -42,7 +42,7 @@ saveRequest player =
     Http.request
         { method = "PATCH"
         , headers = []
-        , url = saveUrl player.id
+        , url = detailUrl player.id
         , body = memberEncoded player |> Http.jsonBody
         , expect = Http.expectJson memberDecoder
         , timeout = Nothing
@@ -86,3 +86,21 @@ newPlayerEncoded player =
             ]
     in
         list |> Encode.object
+
+
+deleteRequest : PlayerId -> Http.Request PlayerId
+deleteRequest playerId =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = detailUrl playerId
+        , body = Http.emptyBody
+        , expect = Http.expectStringResponse (\_ -> Ok playerId)
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+deletePlayer : PlayerId -> Cmd Msg
+deletePlayer playerId =
+    deleteRequest playerId |> Http.send OnDelete

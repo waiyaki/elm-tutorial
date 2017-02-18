@@ -19,3 +19,5 @@ type Msg
     | CreatePlayer
     | AddNewPlayer NewPlayerMsg
     | OnCreate (Result Http.Error Player)
+    | DeletePlayer PlayerId
+    | OnDelete (Result Http.Error PlayerId)

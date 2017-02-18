@@ -32,6 +32,7 @@ formLevel player =
             [ span [ class "h2 bold" ] [ text (toString player.level) ]
             , btnLevelDecrease player
             , btnLevelIncrease player
+            , btnDeletePlayer player
             ]
         ]
 
@@ -46,3 +47,9 @@ btnLevelIncrease : Player -> Html Msg
 btnLevelIncrease player =
     a [ class "btn ml1 h1", onClick (ChangeLevel player.id 1) ]
         [ i [ class "fa fa-plus-circle" ] [] ]
+
+
+btnDeletePlayer : Player -> Html Msg
+btnDeletePlayer player =
+    a [ class "btn ml1 h1", onClick (DeletePlayer player.id) ]
+        [ i [ class "fa fa-trash" ] [] ]
