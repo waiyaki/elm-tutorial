@@ -1,34 +1,81 @@
 module Players.Update exposing (..)
 
 import Navigation
-import Players.Messages exposing (Msg(..))
+import Players.Messages exposing (Msg(..), NewPlayerMsg(..))
 import Players.Models exposing (Player, PlayerId)
-import Players.Commands exposing (save)
+import Players.Commands exposing (save, createPlayer)
+import Models exposing (Model)
 
 
-update : Msg -> List Player -> ( List Player, Cmd Msg )
-update msg players =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
         OnFetchAll (Ok newPlayers) ->
-            ( newPlayers, Cmd.none )
+            ( { model | players = newPlayers }, Cmd.none )
 
         OnFetchAll (Err error) ->
-            ( players, Cmd.none )
+            let
+                err =
+                    Debug.log "error" error
+            in
+                ( model, Cmd.none )
 
         ShowPlayers ->
-            ( players, Navigation.newUrl "#players" )
+            ( model, Navigation.newUrl "#players" )
 
         ShowPlayer id ->
-            ( players, Navigation.newUrl ("#players/" ++ id) )
+            ( model, Navigation.newUrl ("#players/" ++ id) )
 
         ChangeLevel id howMuch ->
-            ( players, changeLevelCommands id howMuch players |> Cmd.batch )
+            ( model, changeLevelCommands id howMuch model.players |> Cmd.batch )
 
         OnSave (Ok updatedPlayer) ->
-            ( updatePlayer updatedPlayer players, Cmd.none )
+            ( { model | players = (updatePlayer updatedPlayer model.players) }, Cmd.none )
 
         OnSave (Err error) ->
-            ( players, Cmd.none )
+            let
+                err =
+                    Debug.log "OnSave error: " error
+            in
+                ( model, Cmd.none )
+
+        OnCreate (Ok newPlayer) ->
+            ( { model
+                | players = List.append model.players [ newPlayer ]
+              }
+            , Navigation.newUrl ("#players/" ++ newPlayer.id)
+            )
+
+        OnCreate (Err error) ->
+            ( model, Cmd.none )
+
+        ShowCreatePage ->
+            ( model, Navigation.newUrl "#create" )
+
+        CreatePlayer ->
+            ( model, createPlayer model.newPlayer )
+
+        AddNewPlayer msg ->
+            case msg of
+                Name name ->
+                    let
+                        player =
+                            model.newPlayer
+
+                        newPlayer =
+                            { player | name = name }
+                    in
+                        ( { model | newPlayer = newPlayer }, Cmd.none )
+
+                Level level ->
+                    let
+                        player =
+                            model.newPlayer
+
+                        newPlayer =
+                            { player | level = level }
+                    in
+                        ( { model | newPlayer = newPlayer }, Cmd.none )
 
 
 changeLevelCommands : PlayerId -> Int -> List Player -> List (Cmd Msg)

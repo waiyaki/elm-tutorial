@@ -5,19 +5,15 @@ import Html.Attributes exposing (class, value, href)
 import Html.Events exposing (onClick)
 import Players.Messages exposing (..)
 import Players.Models exposing (..)
+import Players.Nav
 
 
 view : Player -> Html Msg
 view model =
     div []
-        [ nav model
+        [ Players.Nav.nav
         , form model
         ]
-
-
-nav : Player -> Html Msg
-nav model =
-    div [ class "clearfix mb2 white bg-black p1" ] [ listBtn ]
 
 
 form : Player -> Html Msg
@@ -50,12 +46,3 @@ btnLevelIncrease : Player -> Html Msg
 btnLevelIncrease player =
     a [ class "btn ml1 h1", onClick (ChangeLevel player.id 1) ]
         [ i [ class "fa fa-plus-circle" ] [] ]
-
-
-listBtn : Html Msg
-listBtn =
-    button
-        [ class "btn regular", onClick ShowPlayers ]
-        [ i [ class "fa fa-chevron-left mr1" ] []
-        , text "List"
-        ]

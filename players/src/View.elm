@@ -5,6 +5,7 @@ import Models exposing (Model)
 import Messages exposing (Msg(..))
 import Players.List
 import Players.Edit
+import Players.Create
 import Players.Models exposing (PlayerId)
 import Routing exposing (Route(..))
 
@@ -26,6 +27,9 @@ page model =
 
         NotFoundRoute ->
             notFoundView
+
+        CreateRoute ->
+            Html.map PlayersMsg Players.Create.create
 
 
 playerEditPage : Model -> PlayerId -> Html Msg

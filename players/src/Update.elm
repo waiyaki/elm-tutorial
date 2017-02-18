@@ -18,7 +18,7 @@ update msg model =
 
         PlayersMsg subMsg ->
             let
-                ( updatedPlayers, cmd ) =
-                    Players.Update.update subMsg model.players
+                ( updatedModel, cmd ) =
+                    Players.Update.update subMsg model
             in
-                ( { model | players = updatedPlayers }, Cmd.map PlayersMsg cmd )
+                ( updatedModel, Cmd.map PlayersMsg cmd )

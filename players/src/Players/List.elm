@@ -35,6 +35,7 @@ list players =
                 ]
             , tbody [] (List.map playerRow players)
             ]
+        , createBtn
         ]
 
 
@@ -53,4 +54,14 @@ editBtn player =
     button [ class "btn regular", onClick (ShowPlayer player.id) ]
         [ i [ class "fa fa-pencil mr1" ] []
         , text "Edit"
+        ]
+
+
+createBtn : Html Msg
+createBtn =
+    div []
+        [ button [ class "btn btn-primary", onClick ShowCreatePage ]
+            [ i [ class "fa fa-plus mr1" ] []
+            , text "Create"
+            ]
         ]

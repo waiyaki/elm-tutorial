@@ -4,6 +4,7 @@ import Http
 import Json.Decode as Decode exposing (field)
 import Players.Models exposing (Player, PlayerId)
 import Players.Messages exposing (..)
+import Models exposing (NewPlayer)
 import Json.Encode as Encode
 
 
@@ -60,6 +61,27 @@ memberEncoded player =
         list =
             [ ( "id", Encode.string player.id )
             , ( "name", Encode.string player.name )
+            , ( "level", Encode.int player.level )
+            ]
+    in
+        list |> Encode.object
+
+
+createPlayer : NewPlayer -> Cmd Msg
+createPlayer newPlayer =
+    createRequest newPlayer |> Http.send OnCreate
+
+
+createRequest : NewPlayer -> Http.Request Player
+createRequest newPlayer =
+    Http.post fetchAllUrl (newPlayerEncoded newPlayer |> Http.jsonBody) memberDecoder
+
+
+newPlayerEncoded : NewPlayer -> Encode.Value
+newPlayerEncoded player =
+    let
+        list =
+            [ ( "name", Encode.string player.name )
             , ( "level", Encode.int player.level )
             ]
     in

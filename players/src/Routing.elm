@@ -9,6 +9,7 @@ type Route
     = PlayersRoute
     | PlayerRoute PlayerId
     | NotFoundRoute
+    | CreateRoute
 
 
 matchers : Parser (Route -> a) a
@@ -17,6 +18,7 @@ matchers =
         [ map PlayersRoute top
         , map PlayerRoute (s "players" </> string)
         , map PlayersRoute (s "players")
+        , map CreateRoute (s "create")
         ]
 
 
