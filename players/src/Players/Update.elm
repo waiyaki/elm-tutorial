@@ -47,7 +47,11 @@ update msg model =
             )
 
         OnCreate (Err error) ->
-            ( model, Cmd.none )
+            let
+                err =
+                    Debug.log "Error creating player" error
+            in
+                ( model, Cmd.none )
 
         ShowCreatePage ->
             ( model, Navigation.newUrl "#create" )

@@ -10,13 +10,13 @@ import Json.Encode as Encode
 
 fetchAll : Cmd Msg
 fetchAll =
-    Http.get fetchAllUrl collectionDecoder
+    Http.get baseUrl collectionDecoder
         |> Http.send OnFetchAll
 
 
-fetchAllUrl : String
-fetchAllUrl =
-    "http://localhost:4000/players"
+baseUrl : String
+baseUrl =
+    "http://localhost:4000/players/"
 
 
 collectionDecoder : Decode.Decoder (List Player)
@@ -34,7 +34,7 @@ memberDecoder =
 
 detailUrl : PlayerId -> String
 detailUrl playerId =
-    "http://localhost:4000/players/" ++ playerId
+    baseUrl ++ playerId
 
 
 saveRequest : Player -> Http.Request Player
@@ -55,16 +55,18 @@ save player =
     saveRequest player |> Http.send OnSave
 
 
+baseEncoder : { level : Int, name : String } -> List ( String, Encode.Value )
+baseEncoder { level, name } =
+    [ ( "level", Encode.int level )
+    , ( "name", Encode.string name )
+    ]
+
+
 memberEncoded : Player -> Encode.Value
-memberEncoded player =
-    let
-        list =
-            [ ( "id", Encode.string player.id )
-            , ( "name", Encode.string player.name )
-            , ( "level", Encode.int player.level )
-            ]
-    in
-        list |> Encode.object
+memberEncoded { id, level, name } =
+    ( "level", Encode.string id )
+        :: (baseEncoder { level = level, name = name })
+        |> Encode.object
 
 
 createPlayer : NewPlayer -> Cmd Msg
@@ -74,18 +76,12 @@ createPlayer newPlayer =
 
 createRequest : NewPlayer -> Http.Request Player
 createRequest newPlayer =
-    Http.post fetchAllUrl (newPlayerEncoded newPlayer |> Http.jsonBody) memberDecoder
+    Http.post baseUrl (newPlayerEncoded newPlayer |> Http.jsonBody) memberDecoder
 
 
 newPlayerEncoded : NewPlayer -> Encode.Value
-newPlayerEncoded player =
-    let
-        list =
-            [ ( "name", Encode.string player.name )
-            , ( "level", Encode.int player.level )
-            ]
-    in
-        list |> Encode.object
+newPlayerEncoded newPlayer =
+    baseEncoder newPlayer |> Encode.object
 
 
 deleteRequest : PlayerId -> Http.Request PlayerId
